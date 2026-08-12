@@ -358,6 +358,66 @@ const turrets = [
   }
 ];
 
+const unitProgressions = [
+  {
+    name: "Tank", accent: "#e58a68", tier4Count: 4, tier5Count: 6,
+    tier4Payload: "4 Stell and 10 large Tungsten Walls",
+    tier5Payload: "6 Locus and 20 large Carbide Walls",
+    recipes: {
+      tier1: { blocks: [{ id: "tank-fabricator", name: "Tank Fabricator" }], resources: [{ icon: "beryllium", value: 40 }, { icon: "silicon", value: 50 }, { kind: "power", value: 90 }] },
+      tier2: { blocks: [{ id: "tank-refabricator", name: "Tank Refabricator" }], resources: [{ unit: "stell", value: 1 }, { icon: "silicon", value: 40 }, { icon: "tungsten", value: 30 }, { icon: "hydrogen", value: 3 }, { kind: "power", value: 180 }] },
+      tier3: { blocks: [{ id: "prime-refabricator", name: "Prime Refabricator" }], resources: [{ unit: "locus", value: 1 }, { icon: "thorium", value: 80 }, { icon: "silicon", value: 100 }, { icon: "nitrogen", value: 10 }, { kind: "power", value: 270 }] },
+      tier4: { blocks: [{ id: "tank-assembler", name: "Tank Assembler" }], resources: [{ unit: "stell", value: 4 }, { wall: "tungsten", value: 10 }, { icon: "cyanogen", value: 9 }, { kind: "power", value: 150 }] },
+      tier5: { blocks: [{ id: "tank-assembler", name: "Tank Assembler" }, { id: "basic-assembler-module", name: "Basic Assembler Module" }], resources: [{ unit: "locus", value: 6 }, { wall: "carbide", value: 20 }, { icon: "cyanogen", value: 9 }, { kind: "power", value: "150+210" }] }
+    },
+    units: [
+      { id: "stell", name: "Stell", sector: "onset", description: "Fires standard bullets at enemy targets." },
+      { id: "locus", name: "Locus", sector: "atlas", description: "Fires alternating bullets at enemy targets." },
+      { id: "precept", name: "Precept", sector: "stronghold", description: "Fires piercing cluster bullets at enemy targets. Less affected by liquid drag." },
+      { id: "vanquish", name: "Vanquish", sector: "siege", description: "Fires large piercing splitting bullets at enemy targets. Less affected by liquid drag." },
+      { id: "conquer", name: "Conquer", sector: "origin", description: "Fires large piercing cascades of bullets at enemy targets. Significantly less affected by liquid drag." }
+    ]
+  },
+  {
+    name: "Mech", accent: "#a4bddc", tier4Count: 5, tier5Count: 6,
+    tier4Payload: "5 Merui and 12 large Tungsten Walls",
+    tier5Payload: "6 Cleroi and 20 large Carbide Walls",
+    recipes: {
+      tier1: { blocks: [{ id: "mech-fabricator", name: "Mech Fabricator" }], resources: [{ icon: "beryllium", value: 50 }, { icon: "silicon", value: 70 }, { kind: "power", value: 90 }] },
+      tier2: { blocks: [{ id: "mech-refabricator", name: "Mech Refabricator" }], resources: [{ unit: "merui", value: 1 }, { icon: "silicon", value: 50 }, { icon: "tungsten", value: 40 }, { icon: "hydrogen", value: 3 }, { kind: "power", value: 150 }] },
+      tier3: { blocks: [{ id: "prime-refabricator", name: "Prime Refabricator" }], resources: [{ unit: "cleroi", value: 1 }, { icon: "thorium", value: 80 }, { icon: "silicon", value: 100 }, { icon: "nitrogen", value: 10 }, { kind: "power", value: 270 }] },
+      tier4: { blocks: [{ id: "mech-assembler", name: "Mech Assembler" }], resources: [{ unit: "merui", value: 5 }, { wall: "tungsten", value: 12 }, { icon: "cyanogen", value: 12 }, { kind: "power", value: 180 }] },
+      tier5: { blocks: [{ id: "mech-assembler", name: "Mech Assembler" }, { id: "basic-assembler-module", name: "Basic Assembler Module" }], resources: [{ unit: "cleroi", value: 6 }, { wall: "carbide", value: 20 }, { icon: "cyanogen", value: 12 }, { kind: "power", value: "180+210" }] }
+    },
+    units: [
+      { id: "merui", name: "Merui", sector: "intersect", description: "Fires long-range artillery at enemy ground targets. Can step over most terrain." },
+      { id: "cleroi", name: "Cleroi", sector: "basin", description: "Fires dual shells at enemy targets. Targets enemy projectiles with point defense turrets. Can step over most terrain." },
+      { id: "anthicus", name: "Anthicus", sector: "stronghold", description: "Fires long-range homing missiles at enemy targets. Can step over most terrain." },
+      { id: "tecta", name: "Tecta", sector: "karst", description: "Fires homing plasma missiles at enemy targets. Protects itself with a directional shield. Can step over most terrain." },
+      { id: "collaris", name: "Collaris", sector: "origin", description: "Fires long-range fragmenting artillery at enemy targets. Can step over most terrain." }
+    ]
+  },
+  {
+    name: "Ship", accent: "#aa8be7", tier4Count: 4, tier5Count: 6,
+    tier4Payload: "4 Elude and 12 large Beryllium Walls",
+    tier5Payload: "6 Avert and 20 large Carbide Walls",
+    recipes: {
+      tier1: { blocks: [{ id: "ship-fabricator", name: "Ship Fabricator" }], resources: [{ icon: "graphite", value: 50 }, { icon: "silicon", value: 70 }, { kind: "power", value: 90 }] },
+      tier2: { blocks: [{ id: "ship-refabricator", name: "Ship Refabricator" }], resources: [{ unit: "elude", value: 1 }, { icon: "silicon", value: 60 }, { icon: "tungsten", value: 40 }, { icon: "hydrogen", value: 3 }, { kind: "power", value: 150 }] },
+      tier3: { blocks: [{ id: "prime-refabricator", name: "Prime Refabricator" }], resources: [{ unit: "avert", value: 1 }, { icon: "thorium", value: 80 }, { icon: "silicon", value: 100 }, { icon: "nitrogen", value: 10 }, { kind: "power", value: 270 }] },
+      tier4: { blocks: [{ id: "ship-assembler", name: "Ship Assembler" }], resources: [{ unit: "elude", value: 4 }, { wall: "beryllium", value: 12 }, { icon: "cyanogen", value: 12 }, { kind: "power", value: 150 }] },
+      tier5: { blocks: [{ id: "ship-assembler", name: "Ship Assembler" }, { id: "basic-assembler-module", name: "Basic Assembler Module" }], resources: [{ unit: "avert", value: 6 }, { wall: "carbide", value: 20 }, { icon: "cyanogen", value: 12 }, { kind: "power", value: "150+210" }] }
+    },
+    units: [
+      { id: "elude", name: "Elude", sector: "lake", description: "Fires pairs of homing bullets at enemy targets. Can float over bodies of liquid." },
+      { id: "avert", name: "Avert", sector: "peaks", description: "Fires twisting pairs of bullets at enemy targets." },
+      { id: "obviate", name: "Obviate", sector: "stronghold", description: "Fires twisting pairs of lightning orbs at enemy targets." },
+      { id: "quell", name: "Quell", sector: "crevice", description: "Fires long-range homing missiles with unstable plasma shielding at enemy targets. Suppresses enemy structure repair blocks. Only attacks ground targets." },
+      { id: "disrupt", name: "Disrupt", sector: "origin", description: "Fires long-range homing suppression missiles at enemy targets. Suppresses enemy structure repair blocks. Only attacks ground targets." }
+    ]
+  }
+];
+
 // Full working edge against one Erekir wall type; values are sand per second.
 const cliffWallRates = {
   "cliff-crusher": [
@@ -502,6 +562,60 @@ function turretCard(turret) {
   </article>`;
 }
 
+function unitNode(unit, tier) {
+  return `<article class="unit-node" data-unlock-sector="${unit.sector}" style="--unit-size:${48 + tier * 14}px" tabindex="0" aria-label="${unit.name}, tier ${tier}. ${unit.description}">
+    <h3>${unit.name}<br><span class="unit-node__tier">Tier ${tier}</span></h3>
+    <div class="unit-node__visual"><img src="${A}/units/${unit.id}.png" alt="${unit.name}"></div>
+    <div class="unit-node__description"><strong>${unit.name}</strong><span>${unit.description}</span></div>
+  </article>`;
+}
+
+function unitRecipeResource(resource) {
+  let visual = "";
+  if (resource.unit) visual = `<img src="${A}/units/${resource.unit}.png" alt="${resource.unit}">`;
+  else if (resource.wall) visual = `<img src="${A}/walls/${resource.wall}-wall-large.png" alt="Large ${resource.wall} wall">`;
+  else if (resource.icon) visual = `<img src="${icons[resource.icon]}" alt="${resource.icon}">`;
+  else if (resource.kind === "power") visual = `<img class="unit-edge-recipe__power" src="${A}/resources/power.png" alt="Power">`;
+  return `<span class="${resource.unit ? "unit-edge-recipe__payload" : ""}">${visual}${resource.value}</span>`;
+}
+
+function unitEdgeRecipe(recipe) {
+  const payloads = recipe.resources.filter(resource => resource.unit);
+  const resources = recipe.resources.filter(resource => !resource.unit);
+  return `<aside class="unit-edge-recipe${recipe.blocks.length > 1 ? " unit-edge-recipe--multi" : ""}" aria-label="${recipe.blocks.map(block => block.name).join(" and ")}">
+    <span class="unit-edge-recipe__blocks">${recipe.blocks.map(block => `<img src="${A}/blocks/${block.id}.png" alt="${block.name}" title="${block.name}">`).join("")}</span>
+    ${payloads.length ? `<span class="unit-edge-recipe__payloads">${payloads.map(unitRecipeResource).join("")}</span>` : ""}
+    <span class="unit-edge-recipe__resources">${resources.map(unitRecipeResource).join("")}</span>
+  </aside>`;
+}
+
+function unitResult(unit, tier, recipe) {
+  return `<div class="unit-result${recipe.blocks.length > 1 ? " unit-result--multi" : ""}" data-unlock-sector="${unit.sector}">${unitEdgeRecipe(recipe)}${unitNode(unit, tier)}</div>`;
+}
+
+function unitTree(group) {
+  return `<section class="unit-tree" style="--unit-accent:${group.accent}">
+    <h2>${group.name}</h2>
+    <div class="unit-tree__track">
+      <div class="unit-tree__row unit-tree__row--core">
+        ${unitResult(group.units[0], 1, group.recipes.tier1)}
+        ${unitResult(group.units[1], 2, group.recipes.tier2)}
+        ${unitResult(group.units[2], 3, group.recipes.tier3)}
+      </div>
+      <div class="unit-tree__branch unit-tree__branch--from-two" data-unlock-sector="${group.units[4].sector}">
+        ${unitResult(group.units[4], 5, group.recipes.tier5)}
+      </div>
+      <div class="unit-tree__branch unit-tree__branch--from-one" data-unlock-sector="${group.units[3].sector}">
+        ${unitResult(group.units[3], 4, group.recipes.tier4)}
+      </div>
+      <span class="unit-tree__edge unit-tree__edge--top unit-tree__edge--tier2" data-unlock-sector="${group.units[1].sector}" aria-hidden="true"></span>
+      <span class="unit-tree__edge unit-tree__edge--top unit-tree__edge--tier3" data-unlock-sector="${group.units[2].sector}" aria-hidden="true"></span>
+      <span class="unit-tree__edge unit-tree__edge--branch unit-tree__edge--tier5" data-unlock-sector="${group.units[4].sector}" aria-hidden="true"></span>
+      <span class="unit-tree__edge unit-tree__edge--branch unit-tree__edge--tier4" data-unlock-sector="${group.units[3].sector}" aria-hidden="true"></span>
+    </div>
+  </section>`;
+}
+
 const officialGroups = [
   { name: "Production", ids: [["vent-condenser", "reinforced-pump"], "cliff-crusher", "large-cliff-crusher", "plasma-bore", "large-plasma-bore", "impact-drill", "eruption-drill"] },
   { name: "Power", ids: ["turbine-condenser", "chemical-combustion-chamber", "pyrolysis-generator", "flux-reactor", "neoplasia-reactor"] },
@@ -522,7 +636,7 @@ grid.innerHTML = `
     `).join("")}
   </div>
   <div class="units-layout" hidden>
-    ${blocks.filter(block => block.category === "units").map(blockCard).join("")}
+    ${unitProgressions.map(unitTree).join("")}
   </div>
   <div class="turrets-layout" hidden>
     ${turrets.map(turretCard).join("")}
@@ -541,7 +655,7 @@ function filterBySector(selected) {
   const capturedRank = sectorRank.get(sector);
   sectorFilter.value = sector;
   progressionEntries.forEach(entry => {
-    entry.hidden = sectorRank.get(entry.dataset.unlockSector) > capturedRank;
+    entry.toggleAttribute("hidden", sectorRank.get(entry.dataset.unlockSector) > capturedRank);
   });
   document.querySelectorAll(".entry-stack").forEach(stack => {
     stack.hidden = [...stack.querySelectorAll(".card")].every(card => card.hidden);
