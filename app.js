@@ -231,6 +231,133 @@ const boosterRecipes = {
   }
 };
 
+const campaignSectors = [
+  ["onset", "The Onset"], ["aegis", "Aegis"], ["lake", "Lake"],
+  ["intersect", "Intersect"], ["atlas", "Atlas"], ["split", "Split"],
+  ["basin", "Basin"], ["marsh", "Marsh"], ["ravine", "Ravine"],
+  ["peaks", "Peaks"], ["caldera", "Caldera"], ["stronghold", "Stronghold"],
+  ["crevice", "Crevice"], ["siege", "Siege"], ["crossroads", "Crossroads"],
+  ["karst", "Karst"], ["origin", "Origin"]
+];
+
+const unlockSectorByBlock = {
+  "vent-condenser": "aegis", "reinforced-pump": "basin", "cliff-crusher": "onset",
+  "large-cliff-crusher": "stronghold", "plasma-bore": "onset", "large-plasma-bore": "caldera",
+  "impact-drill": "aegis", "eruption-drill": "stronghold",
+  "turbine-condenser": "onset", "chemical-combustion-chamber": "basin",
+  "pyrolysis-generator": "crevice", "flux-reactor": "crossroads", "neoplasia-reactor": "karst",
+  "silicon-arc-furnace": "onset", electrolyzer: "atlas", "atmospheric-concentrator": "caldera",
+  "oxidation-chamber": "marsh", "electric-heater": "ravine", "slag-heater": "caldera",
+  "phase-heater": "karst", "carbide-crucible": "crevice", "surge-crucible": "ravine",
+  "cyanogen-synthesizer": "siege", "phase-synthesizer": "karst",
+  "tank-fabricator": "onset", "ship-fabricator": "lake", "mech-fabricator": "intersect",
+  "tank-refabricator": "atlas", "mech-refabricator": "basin", "ship-refabricator": "peaks",
+  "prime-refabricator": "stronghold"
+};
+
+const sectorRank = new Map(campaignSectors.map(([id], index) => [id, index]));
+
+const turrets = [
+  {
+    id: "breach", name: "Breach", size: 3, range: 190, sector: "onset", accent: "#80d98b",
+    cost: [["beryllium", 150], ["silicon", 150], ["graphite", 125]],
+    ammo: [
+      { icon: "beryllium", consumption: "3", rate: "1.5", damage: "85", dps: "127.5" },
+      { icon: "tungsten", consumption: "1.5", rate: "1.5", damage: "95", dps: "142.5" },
+      { icon: "carbide", consumption: "0.3", rate: "0.3", damage: "433 + 227(x3)", dps: "129.9 + 68.1(x3)" }
+    ],
+    targets: "Ground / Air", description: "Fires piercing bullets at enemy targets.",
+    boosters: [{ icon: "water", amount: "15", speed: "x2.5" }]
+  },
+  {
+    id: "diffuse", name: "Diffuse", size: 3, range: 125, sector: "lake", accent: "#ef8b75",
+    cost: [["beryllium", 150], ["silicon", 200], ["graphite", 200], ["tungsten", 50]],
+    ammo: [
+      { icon: "graphite", consumption: "6", rate: "30", damage: "41", dps: "1230" },
+      { icon: "oxide", consumption: "3", rate: "30", damage: "90", dps: "2700" },
+      { icon: "silicon", consumption: "6", rate: "30", damage: "35", dps: "1050" }
+    ],
+    targets: "Ground / Air", description: "Fires bursts of bullets in a wide cone. Pushes enemy targets back.",
+    boosters: [{ icon: "water", amount: "15", speed: "x2.5" }]
+  },
+  {
+    id: "sublimate", name: "Sublimate", size: 3, range: 130, sector: "marsh", accent: "#9aa7ff",
+    cost: [["tungsten", 150], ["silicon", 200], ["oxide", 40], ["beryllium", 400]],
+    ammo: [
+      { icon: "ozone", consumption: "18", rate: "cont.", damage: "–", dps: "720" },
+      { icon: "cyanogen", consumption: "18", rate: "cont.", damage: "–", dps: "1560" }
+    ],
+    targets: "Ground / Air", description: "Fires a continuous jet of flame at enemy targets. Pierces armor.",
+    boosters: []
+  },
+  {
+    id: "titan", name: "Titan", size: 4, range: 390, sector: "stronghold", accent: "#e99579",
+    cost: [["tungsten", 250], ["silicon", 300], ["thorium", 400]],
+    inputs: [{ icon: "hydrogen", amount: "5" }],
+    ammo: [
+      { icon: "thorium", consumption: "1.74", rate: "0.43", damage: "350 +350(R8.1)", dps: "150.5 +150.5(R8.1)" },
+      { icon: "carbide", consumption: "1.39", rate: "0.35", damage: "700 +750(R4.5)", dps: "245 +262.5(R4.5)" },
+      { icon: "oxide", consumption: "1.22", rate: "0.30", damage: "300 +180(R13.8)", dps: "90 +54(R13.8)" }
+    ],
+    targets: "Ground", description: "Fires massive explosive artillery shells at ground targets. Requires hydrogen.",
+    boosters: [{ icon: "water", amount: "30", speed: "x1.75" }]
+  },
+  {
+    id: "disperse", name: "Disperse", size: 4, range: 310, sector: "stronghold", accent: "#83c8ec",
+    cost: [["thorium", 50], ["oxide", 50], ["silicon", 200], ["beryllium", 350]],
+    ammo: [
+      { icon: "tungsten", consumption: "2.22", rate: "26.67", damage: "65", dps: "1733.6" },
+      { icon: "thorium", consumption: "5.67", rate: "22.67", damage: "90", dps: "2040.3" },
+      { icon: "silicon", consumption: "1.67", rate: "26.67", damage: "37", dps: "986.8" },
+      { icon: "surge", consumption: "1.67", rate: "20", damage: "65 +18(x3) +20(x7)", dps: "1300 +360(x3) +400(x7)" }
+    ],
+    targets: "Air", description: "Fires bursts of flak at aerial targets.",
+    boosters: [{ icon: "water", amount: "20", speed: "x1.83" }]
+  },
+  {
+    id: "afflict", name: "Afflict", size: 4, range: 368, sector: "ravine", accent: "#f3c95b",
+    cost: [["surge", 100], ["silicon", 200], ["graphite", 250], ["oxide", 40]],
+    inputs: [{ kind: "heat", amount: "20" }],
+    ammo: [{ kind: "power", consumption: "300", rate: "1.2", damage: "180 + 35(x~74)", dps: "216 +42(x~74)" }],
+    targets: "Ground / Air", description: "Fires massive charged orbs of fragmentary flak. Requires heating.",
+    boosters: []
+  },
+  {
+    id: "lustre", name: "Lustre", size: 4, range: 250, sector: "crevice", accent: "#f0aa83",
+    cost: [["silicon", 250], ["graphite", 200], ["oxide", 50], ["carbide", 90]],
+    inputs: [{ icon: "nitrogen", amount: "6" }],
+    ammo: [{ kind: "power", consumption: "200", rate: "cont.", damage: "–", dps: "2520" }],
+    targets: "Ground / Air", description: "Fires a continuous slow-moving single-target laser at enemy targets.",
+    boosters: []
+  },
+  {
+    id: "scathe", name: "Scathe", size: 4, range: 1350, sector: "siege", accent: "#eb9478",
+    cost: [["silicon", 450], ["graphite", 400], ["tungsten", 500], ["oxide", 100], ["carbide", 200]],
+    ammo: [
+      { icon: "carbide", consumption: "1.5", rate: "0.10", damage: "+1000(R8.1)", dps: "+100(R8.1)" },
+      { icon: "phase", consumption: "1.2", rate: "0.08", damage: "+320(R15)", dps: "+25.6(R15)" },
+      { icon: "surge", consumption: "1.35", rate: "0.09", damage: "+1800(R5)", dps: "+162(R5)" }
+    ],
+    targets: "Ground", description: "Launches powerful missiles at ground targets over vast distances.",
+    boosters: [{ icon: "water", amount: "15", speed: "x2.5" }]
+  },
+  {
+    id: "smite", name: "Smite", size: 5, range: 300, sector: "karst", accent: "#efd760",
+    cost: [["oxide", 200], ["surge", 400], ["silicon", 800], ["carbide", 500], ["phase", 300]],
+    ammo: [{ icon: "surge", consumption: "1.2", rate: "3", damage: "250 + 30(x~13)", dps: "750 +90(x~13)" }],
+    targets: "Ground / Air", description: "Fires bursts of piercing, lightning-emitting bullets.",
+    boosters: [{ icon: "water", amount: "15", speed: "x2.5" }]
+  },
+  {
+    id: "malign", name: "Malign", size: 5, range: 410, sector: "karst", accent: "#d884dc",
+    cost: [["carbide", 200], ["beryllium", 1000], ["silicon", 500], ["graphite", 500], ["phase", 200]],
+    inputs: [{ kind: "heat", amount: "144" }],
+    ammo: [{ kind: "power", consumption: "2400", rate: "17.14", damage: "70 + 65(x9) + 18(x~2)", dps: "1200 +1114.1(x9) +308.5(x~2)" }],
+    targets: "Ground / Air", description: "Fires a barrage of homing laser charges at enemy targets. Requires extensive heating.",
+    boosters: []
+  }
+];
+
 // Full working edge against one Erekir wall type; values are sand per second.
 const cliffWallRates = {
   "cliff-crusher": [
@@ -252,6 +379,7 @@ const cliffWallRates = {
 blocks.forEach(block => {
   block.size = blockSizes[block.id];
   block.booster = boosterRecipes[block.id];
+  block.unlockSector = unlockSectorByBlock[block.id] ?? "onset";
   const power = powerPerSecond[block.id];
   if (power && !block.input.some(resource => resource.kind === "power")) {
     block.input.push({ kind: "power", value: String(power) });
@@ -311,13 +439,66 @@ function wallRateGuide(block) {
 
 function blockCard(block) {
   return `
-  <article class="card" tabindex="0" data-category="${block.category}" data-size="${block.size}" style="--card-accent:${block.accent};--block-size:${block.size}" aria-label="${block.name}. ${block.size} by ${block.size} tiles. Focus or hover for description." aria-describedby="description-${block.id}">
+  <article class="card" tabindex="0" data-category="${block.category}" data-size="${block.size}" data-unlock-sector="${block.unlockSector}" style="--card-accent:${block.accent};--block-size:${block.size}" aria-label="${block.name}. ${block.size} by ${block.size} tiles. Available by ${campaignSectors[sectorRank.get(block.unlockSector)][1]}. Focus or hover for description." aria-describedby="description-${block.id}">
     <div class="card__body">
       <h2>${block.name}</h2>
       ${recipe(block)}
       ${wallRateGuide(block)}
     </div>
     <div class="description" id="description-${block.id}"><p>${block.description}</p></div>
+  </article>`;
+}
+
+function turretIcon(entry, className = "") {
+  if (entry.icon) return `<img class="${className}" src="${icons[entry.icon]}" alt="${entry.icon}">`;
+  if (entry.kind === "power") return `<img class="${className} turret-power-icon" src="${A}/resources/power.png" alt="Power">`;
+  if (entry.kind === "heat") return `<i class="${className} resource__heat" aria-label="Heat">&#xE83B;</i>`;
+  return "";
+}
+
+function turretDamage(value) {
+  const compact = String(value).replaceAll(" ", "");
+  if (compact === "–") return `<span class="turret-damage"><span class="turret-damage__main">–</span></span>`;
+  const splashOnly = compact.startsWith("+");
+  const parts = compact.split("+").filter(Boolean);
+  const main = splashOnly ? "0" : parts.shift();
+  return `<span class="turret-damage">
+    <span class="turret-damage__main">${main}</span>
+    ${parts.map(part => `<span class="turret-damage__extra">+${part}</span>`).join("")}
+  </span>`;
+}
+
+function turretCard(turret) {
+  const cost = turret.cost.map(([icon, amount]) => `<span class="turret-cost__item">${turretIcon({icon})}${amount}</span>`).join("");
+  const requiredAmmo = turret.inputs?.map(input => `<span class="turret-ammo__resource turret-ammo__resource--required">${turretIcon(input)}<span>${input.amount}</span></span>`).join("") ?? "";
+  const ammo = turret.ammo.map(round => `<div class="turret-ammo__round">
+    <span class="turret-ammo__type">${requiredAmmo}<span class="turret-ammo__resource">${turretIcon(round)}<span>${round.consumption}</span></span></span>
+    <span title="Firing rate">${round.rate}</span>
+    <span title="Damage per shot">${turretDamage(round.damage)}</span>
+    <span title="Damage per second">${turretDamage(round.dps)}</span>
+  </div>`).join("");
+  const boosters = turret.boosters.map(booster => `<div class="turret-booster">
+    ${turretIcon(booster)}<span>${booster.amount}</span><b>(${booster.speed})</b>
+  </div>`).join("");
+
+  return `<article class="turret-entry" data-unlock-sector="${turret.sector}" style="--turret-accent:${turret.accent};--turret-size:${turret.size}" aria-label="${turret.name}. Available by ${campaignSectors[sectorRank.get(turret.sector)][1]}.">
+    <h2>${turret.name} <span class="turret-targets">(${turret.targets})</span><span class="turret-range" title="Range in tiles">Range ${turret.range / 8}</span><span class="turret-description">${turret.description}</span></h2>
+    <div class="turret-entry__main">
+      <div class="turret-visual" title="${turret.size} by ${turret.size} tiles">
+        <img class="turret-base" src="${A}/turrets/bases/${turret.size}.png" alt="">
+        <img class="turret-face" src="${A}/turrets/${turret.id}.png" alt="${turret.name} turret facing right">
+        <span class="turret-shot" aria-hidden="true"></span>
+      </div>
+      <div class="turret-cost" aria-label="Construction cost"><span class="turret-column-label">Cost</span>${cost}</div>
+      <div class="turret-ammo">
+        <div class="turret-ammo__head"><span>Ammo</span><span>Rate</span><span>DMG Per<br>Shot</span><span>DMG Per<br>Second</span></div>
+        ${ammo}
+      </div>
+      <div class="turret-boosters" aria-label="Boosters">
+        <span class="turret-column-label">Booster</span>
+        ${boosters || `<span class="turret-booster--none">—</span>`}
+      </div>
+    </div>
   </article>`;
 }
 
@@ -342,24 +523,54 @@ grid.innerHTML = `
   </div>
   <div class="units-layout" hidden>
     ${blocks.filter(block => block.category === "units").map(blockCard).join("")}
+  </div>
+  <div class="turrets-layout" hidden>
+    ${turrets.map(turretCard).join("")}
   </div>`;
 
 const cards = [...document.querySelectorAll(".card")];
+const progressionEntries = [...document.querySelectorAll("[data-unlock-sector]")];
 const filters = [...document.querySelectorAll(".filter")];
+const sectorFilter = document.querySelector("#sector-filter");
+
+sectorFilter.innerHTML = campaignSectors.map(([id, name]) => `<option value="${id}">${name}</option>`).join("");
+
+function filterBySector(selected) {
+  const fallback = campaignSectors.at(-1)[0];
+  const sector = sectorRank.has(selected) ? selected : fallback;
+  const capturedRank = sectorRank.get(sector);
+  sectorFilter.value = sector;
+  progressionEntries.forEach(entry => {
+    entry.hidden = sectorRank.get(entry.dataset.unlockSector) > capturedRank;
+  });
+  document.querySelectorAll(".entry-stack").forEach(stack => {
+    stack.hidden = [...stack.querySelectorAll(".card")].every(card => card.hidden);
+  });
+  const url = new URL(location.href);
+  url.searchParams.set("sector", sector);
+  history.replaceState(null, "", url);
+}
 
 function showView(selected) {
-  const view = selected === "units" ? "units" : "production";
-  const tab = view === "units" ? "units" : "infrastructure";
+  const view = selected === "units" ? "units" : selected === "turrets" ? "turrets" : "production";
+  const tab = view === "production" ? "infrastructure" : view;
   filters.forEach(button => button.classList.toggle("is-active", button.dataset.filter === tab));
   grid.dataset.view = view;
-  document.querySelector(".infrastructure-layout").hidden = view === "units";
+  document.querySelector(".infrastructure-layout").hidden = view !== "production";
   document.querySelector(".units-layout").hidden = view !== "units";
+  document.querySelector(".turrets-layout").hidden = view !== "turrets";
   cards.forEach(card => card.classList.remove("is-open"));
+  const url = new URL(location.href);
+  url.searchParams.set("tab", tab);
+  history.replaceState(null, "", url);
 }
 
 filters.forEach(button => button.addEventListener("click", () => showView(button.dataset.filter)));
 
-showView(new URLSearchParams(location.search).get("tab"));
+const initialParams = new URLSearchParams(location.search);
+showView(initialParams.get("tab"));
+filterBySector(initialParams.get("sector"));
+sectorFilter.addEventListener("change", () => filterBySector(sectorFilter.value));
 
 cards.forEach(card => {
   card.addEventListener("click", () => {

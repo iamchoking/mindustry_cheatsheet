@@ -16,8 +16,12 @@
       <nav class="filters" aria-label="Reference section">
         <button class="filter is-active" data-filter="infrastructure">Infrastructure</button>
         <button class="filter" data-filter="units">Units</button>
+        <button class="filter" data-filter="turrets">Turrets</button>
       </nav>
-      <p class="hint">Hover or tap a block for its description</p>
+      <label class="progression-filter" for="sector-filter">
+        <span>Latest sector</span>
+        <select id="sector-filter" aria-label="Latest Erekir sector captured"></select>
+      </label>
     </header>
 
     <section class="block-grid" id="block-grid" aria-live="polite"></section>
