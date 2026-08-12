@@ -88,18 +88,18 @@ body {
 
 .infrastructure-layout {
   display: grid;
-  height: 100%;
-  min-height: 0;
-  grid-template-rows: 1fr 1fr 2fr;
-  gap: 2px;
+  height: auto;
+  min-height: 100%;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  gap: 12px;
 }
 
 .category-group {
   display: grid;
-  width: max-content;
+  width: 100%;
   max-width: 100%;
-  min-height: 0;
-  grid-template-rows: 17px minmax(0, 1fr);
+  grid-template-rows: 17px auto;
   justify-self: start;
 }
 
@@ -115,38 +115,35 @@ body {
 }
 
 .category-grid {
-  display: grid;
-  width: max-content;
+  display: flex;
+  width: 100%;
   min-height: 0;
-  grid-template-columns: repeat(7, max-content);
-  justify-content: start;
-  column-gap: 0;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  row-gap: 6px;
 }
 
 .category-group--production .card { --tile-unit: 19px; }
 
-.category-group--power .category-grid {
-  grid-template-columns: repeat(5, max-content);
-}
-
 .category-group--crafting .category-grid {
-  grid-template-columns: repeat(6, max-content);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  align-content: flex-start;
 }
 
 .units-layout {
-  display: grid;
+  display: flex;
   height: 100%;
   min-height: 0;
-  grid-template-columns: repeat(4, max-content);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  flex-wrap: wrap;
+  align-content: space-around;
   justify-content: start;
-  gap: 4px 0;
 }
 
 .card {
   --tile-unit: 22px;
   position: relative;
+  flex: 0 0 auto;
+  max-width: 100%;
   display: grid;
   min-width: 0;
   min-height: 0;
@@ -374,7 +371,6 @@ body {
   .filters { justify-self: end; }
   .hint { display: none; }
   .wordmark { font-size: .58rem; }
-  .category-grid, .units-layout { column-gap: 0; }
 }
 
 @media (max-width: 620px) {
@@ -387,7 +383,7 @@ body {
   .category-group { display: block; }
   .category-group { width: 100%; }
   .group-title { width: 100%; margin: 10px 0 3px; }
-  .category-grid, .category-group--power .category-grid, .category-group--crafting .category-grid, .units-layout { grid-template-columns: 1fr; grid-template-rows: none; }
+  .category-grid, .units-layout { display: flex; height: auto; }
   .card { min-height: 135px; }
   .card, .category-group--production .card { --tile-unit: 24px; }
   .recipe { grid-template-columns: max-content 15px calc(var(--block-size) * var(--tile-unit)) 15px max-content; }
