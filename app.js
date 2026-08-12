@@ -241,7 +241,8 @@ function resourceChip(resource, boosted = false, direction = "input") {
   const value = String(resource.value).replaceAll("/s", "");
   const className = `resource${boosted ? " resource--boost" : ""}`;
   const prefix = boosted ? "Booster: " : "";
-  const arrange = visual => direction === "output" ? `${visual}${value}` : `${value}${visual}`;
+  const quantity = value ? `<span class="resource__value">${value}</span>` : "";
+  const arrange = visual => direction === "output" ? `${visual}${quantity}` : `${quantity}${visual}`;
   if (resource.icons) {
     const names = resource.icons.join(", ");
     const images = resource.icons.map(icon => `<img src="${icons[icon]}" alt="">`).join("");
@@ -254,8 +255,8 @@ function resourceChip(resource, boosted = false, direction = "input") {
   if (resource.unit) {
     return `<span class="${className}" title="${prefix}${resource.unit}">${arrange(`<img src="${A}/units/${resource.unit}.png" alt="">`)}</span>`;
   }
-  if (resource.kind === "power") return `<span class="${className}">${arrange('<i class="power">ϟ</i>')}</span>`;
-  if (resource.kind === "heat") return `<span class="${className}">${arrange('<i class="heat">≈</i>')}</span>`;
+  if (resource.kind === "power") return `<span class="${className}" title="Power">${arrange(`<img class="resource__power" src="${A}/resources/power.png" alt="Power">`)}</span>`;
+  if (resource.kind === "heat") return `<span class="${className}" title="Heat">${arrange('<i class="resource__heat" aria-label="Heat">&#xE83B;</i>')}</span>`;
   return `<span class="${className}">${value}</span>`;
 }
 
