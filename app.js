@@ -418,6 +418,24 @@ const unitProgressions = [
   }
 ];
 
+const unitStats = {
+  stell:    { health: 850,   range: "19.5", dps: "48" },
+  locus:    { health: 2100,  range: "19.5", dps: "160" },
+  precept:  { health: 5000,  range: "24",   dps: "232.5", detail: "90 +37.5(R2.5) +26.25(x4)" },
+  vanquish: { health: 11000, range: "22",   dps: "603.72", detail: "359.97 +37.5(R2.5) +26.25(x5) +15(R1.25)(x5)" },
+  conquer:  { health: 22000, range: "34.5", dps: "1116", detail: "216 +36(x12) +39(R3.75)(x12)" },
+  merui:    { health: 680,   range: "16.75", dps: "66.67", detail: "38.1 +28.57(R2.375)" },
+  cleroi:   { health: 1100,  range: "17",   dps: "132.73", detail: "54.55 +78.18(R3.75)" },
+  anthicus: { health: 2700,  range: "41.2", dps: "129.23", detail: "0 +129.23(R3.125)" },
+  tecta:    { health: 6500,  range: "28.38", dps: "499.5", detail: "229.5 +270(R3.75)" },
+  collaris: { health: 18000, range: "47.63", dps: "673.85", detail: "120 +55.38(R4.5) +17.08(x15) +16.15(R3.75)(x15)" },
+  elude:    { health: 600,   range: "18.25", dps: "48" },
+  avert:    { health: 1100,  range: "10.75", dps: "169.14", detail: "100.57 +17.14(x4)" },
+  obviate:  { health: 2300,  range: "22",   dps: "386.57", detail: "64.29 +7.29(x~16) +6.86(x~30)" },
+  quell:    { health: 6000,  range: "45.15", dps: "196.36", detail: "76.36 +120(R3.125)" },
+  disrupt:  { health: 12000, range: "58.15", dps: "360", detail: "0 +360(R3.125)" }
+};
+
 // Full working edge against one Erekir wall type; values are sand per second.
 const cliffWallRates = {
   "cliff-crusher": [
@@ -528,6 +546,15 @@ function turretDamage(value) {
   </span>`;
 }
 
+function unitDps(stats) {
+  const parts = String(stats.detail ?? stats.dps).replaceAll(" ", "").split("+");
+  const main = parts.shift();
+  return {
+    main,
+    extras: parts.map(part => `<span>+${part.replace("(x", "<wbr>(x")}</span>`).join("")
+  };
+}
+
 function turretCard(turret) {
   const cost = turret.cost.map(([icon, amount]) => `<span class="turret-cost__item">${turretIcon({icon})}${amount}</span>`).join("");
   const requiredAmmo = turret.inputs?.map(input => `<span class="turret-ammo__resource turret-ammo__resource--required">${turretIcon(input)}<span>${input.amount}</span></span>`).join("") ?? "";
@@ -563,9 +590,17 @@ function turretCard(turret) {
 }
 
 function unitNode(unit, tier) {
+  const stats = unitStats[unit.id];
+  const damage = unitDps(stats);
   return `<article class="unit-node" data-unlock-sector="${unit.sector}" style="--unit-size:${48 + tier * 14}px" tabindex="0" aria-label="${unit.name}, tier ${tier}. ${unit.description}">
     <h3>${unit.name}<br><span class="unit-node__tier">Tier ${tier}</span></h3>
     <div class="unit-node__visual"><img src="${A}/units/${unit.id}.png" alt="${unit.name}"></div>
+    <dl class="unit-node__stats" aria-label="${unit.name} combat statistics">
+      <div><dt>Health</dt><dd>${stats.health}</dd></div>
+      <div><dt>Range</dt><dd title="Range in tiles">${stats.range}</dd></div>
+      <div class="unit-node__dps"><dt>DPS</dt><dd title="Total DPS: ${stats.dps}">${damage.main}</dd></div>
+      ${damage.extras ? `<dd class="unit-node__damage-extra" aria-label="Additional DPS: ${stats.detail}">${damage.extras}</dd>` : ""}
+    </dl>
     <div class="unit-node__description"><strong>${unit.name}</strong><span>${unit.description}</span></div>
   </article>`;
 }
@@ -646,6 +681,7 @@ const cards = [...document.querySelectorAll(".card")];
 const progressionEntries = [...document.querySelectorAll("[data-unlock-sector]")];
 const filters = [...document.querySelectorAll(".filter")];
 const sectorFilter = document.querySelector("#sector-filter");
+const downloadButton = document.querySelector("#download-button");
 
 sectorFilter.innerHTML = campaignSectors.map(([id, name]) => `<option value="${id}">${name}</option>`).join("");
 
@@ -693,6 +729,74 @@ cards.forEach(card => {
     card.classList.toggle("is-open", willOpen);
   });
 });
+
+async function renderPagePng() {
+  const shell = document.querySelector(".app-shell");
+  await document.fonts.ready;
+  await Promise.all([...shell.querySelectorAll("img")].map(image => image.decode?.().catch(() => undefined)));
+
+  const width = Math.ceil(Math.max(shell.clientWidth, shell.scrollWidth));
+  const height = Math.ceil(Math.max(shell.clientHeight, shell.scrollHeight));
+  const embeddedAssets = window.cheatsheetAssetData || {};
+  const images = [...shell.querySelectorAll("img")];
+  const originalSources = images.map(image => image.getAttribute("src"));
+
+  images.forEach((image, index) => {
+    const source = originalSources[index]?.split(/[?#]/, 1)[0];
+    if (source && embeddedAssets[source]) image.src = embeddedAssets[source];
+  });
+
+  try {
+    await Promise.all(images.map(image => image.decode?.().catch(() => undefined)));
+    const iconFont = embeddedAssets["assets/fonts/icon.ttf"];
+    return await htmlToImage.toPng(shell, {
+      backgroundColor: "#050708",
+      cacheBust: false,
+      fontEmbedCSS: iconFont
+        ? `@font-face { font-family: "Mindustry Icons"; src: url("${iconFont}") format("truetype"); font-display: block; }`
+        : undefined,
+      pixelRatio: Math.min(2, Math.max(1, window.devicePixelRatio || 1)),
+      width,
+      height,
+      style: {
+        width: `${width}px`,
+        height: `${height}px`,
+        overflow: "visible"
+      }
+    });
+  } finally {
+    images.forEach((image, index) => {
+      const source = originalSources[index];
+      if (source === null) image.removeAttribute("src");
+      else image.setAttribute("src", source);
+    });
+  }
+}
+
+async function downloadCurrentPage() {
+  const originalLabel = downloadButton.textContent;
+  downloadButton.disabled = true;
+  downloadButton.textContent = "Saving…";
+  document.body.classList.add("is-capturing");
+
+  try {
+    const dataUrl = await renderPagePng();
+    const view = grid.dataset.view === "production" ? "infrastructure" : grid.dataset.view === "turrets" ? "defence" : "units";
+    const link = document.createElement("a");
+    link.download = `mindustry-cheatsheet-erekir-${view}-${sectorFilter.value}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (error) {
+    console.error("PNG export failed", error);
+    window.alert("The PNG could not be created. Try opening the shared web preview or serving this folder over HTTP.");
+  } finally {
+    document.body.classList.remove("is-capturing");
+    downloadButton.disabled = false;
+    downloadButton.textContent = originalLabel;
+  }
+}
+
+downloadButton.addEventListener("click", downloadCurrentPage);
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
