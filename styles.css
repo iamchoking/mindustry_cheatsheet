@@ -182,6 +182,51 @@ body {
 
 .recipe--source { grid-template-columns: calc(var(--block-size) * var(--tile-unit)) 11px max-content; justify-content: center; }
 
+.wall-guide {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
+  gap: 2px 6px;
+  margin-top: 4px;
+  color: #cbd1d0;
+  font: 500 calc(var(--resource-icon-size, 16px) * .7)/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.wall-guide__label {
+  grid-column: 1 / -1;
+  color: #697476;
+  font-size: .48rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.wall-rate {
+  display: inline-flex;
+  height: 16px;
+  align-items: center;
+  gap: 2px;
+}
+
+.wall-rate__icons {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+}
+
+.wall-rate__icons img {
+  grid-area: 1 / 1;
+  width: 15px;
+  height: 15px;
+  image-rendering: pixelated;
+}
+
+.wall-rate__icons--2 { width: 22px; }
+.wall-rate__icons--2 img:first-child { transform: translateX(-3px); }
+.wall-rate__icons--2 img:last-child { transform: translateX(3px); }
+
 .recipe__side {
   display: flex;
   flex-direction: column;

@@ -226,6 +226,24 @@ const boosterRecipes = {
   }
 };
 
+// Full working edge against one Erekir wall type; values are sand per second.
+const cliffWallRates = {
+  "cliff-crusher": [
+    { walls: ["ferric"], names: "Ferric Stone", value: "0.55" },
+    { walls: ["carbon"], names: "Carbon", value: "0.76" },
+    { walls: ["regolith", "rhyolite"], names: "Regolith / Rhyolite", value: "1.09" },
+    { walls: ["beryllic"], names: "Beryllic Stone", value: "1.31" },
+    { walls: ["yellow-stone", "red-stone"], names: "Yellow Stone / Red Stone", value: "1.64" }
+  ],
+  "large-cliff-crusher": [
+    { walls: ["ferric"], names: "Ferric Stone", value: "1.88" },
+    { walls: ["carbon"], names: "Carbon", value: "2.63" },
+    { walls: ["regolith", "rhyolite"], names: "Regolith / Rhyolite", value: "3.75" },
+    { walls: ["beryllic"], names: "Beryllic Stone", value: "4.5" },
+    { walls: ["yellow-stone", "red-stone"], names: "Yellow Stone / Red Stone", value: "5.63" }
+  ]
+};
+
 blocks.forEach(block => {
   block.size = blockSizes[block.id];
   block.booster = boosterRecipes[block.id];
@@ -273,12 +291,25 @@ function recipe(block) {
   </div>`;
 }
 
+function wallRateGuide(block) {
+  const rates = cliffWallRates[block.id];
+  if (!rates) return "";
+  return `<div class="wall-guide" aria-label="Sand output by wall type">
+    <span class="wall-guide__label">base wall output</span>
+    ${rates.map(rate => `<span class="wall-rate" title="${rate.names}: ${rate.value} sand per second">
+      <span class="wall-rate__icons wall-rate__icons--${rate.walls.length}">${rate.walls.map(wall => `<img src="${A}/walls/${wall}.png" alt="">`).join("")}</span>
+      <span>${rate.value}</span>
+    </span>`).join("")}
+  </div>`;
+}
+
 function blockCard(block) {
   return `
   <article class="card" tabindex="0" data-category="${block.category}" data-size="${block.size}" style="--card-accent:${block.accent};--block-size:${block.size}" aria-label="${block.name}. ${block.size} by ${block.size} tiles. Focus or hover for description." aria-describedby="description-${block.id}">
     <div class="card__body">
       <h2>${block.name}</h2>
       ${recipe(block)}
+      ${wallRateGuide(block)}
     </div>
     <div class="description" id="description-${block.id}"><p>${block.description}</p></div>
   </article>`;
