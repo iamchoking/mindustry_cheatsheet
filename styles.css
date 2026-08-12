@@ -126,6 +126,13 @@ body {
 
 .category-group--production .card { --tile-unit: 19px; }
 
+.entry-stack {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .category-group--crafting .category-grid {
   align-content: flex-start;
 }
@@ -353,6 +360,11 @@ body {
 
 .resource img.resource__power {
   image-rendering: auto;
+}
+
+.resource img.resource__liquid {
+  image-rendering: pixelated;
+  opacity: .9;
 }
 
 .resource__heat {

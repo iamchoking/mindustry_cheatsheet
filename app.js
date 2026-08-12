@@ -31,6 +31,11 @@ const blocks = [
     description: "Condenses vent gases into water. Consumes power."
   },
   {
+    name: "Reinforced Pump", id: "reinforced-pump", category: "production", accent: "#8db7da",
+    input: [{ icon: "hydrogen", value: "1.5/s" }], output: [{ kind: "liquid", value: "80/s" }],
+    description: "Pumps and outputs liquids. Requires hydrogen."
+  },
+  {
     name: "Silicon Arc Furnace", id: "silicon-arc-furnace", category: "crafting", accent: "#f0ad76",
     input: [{ icon: "sand", value: "1.2/s" }, { icon: "graphite", value: "4.8/s" }], output: [{ icon: "silicon", value: "4.8/s" }],
     description: "Refines silicon from sand and graphite."
@@ -178,7 +183,7 @@ const blocks = [
 ];
 
 const blockSizes = {
-  "vent-condenser": 3, "cliff-crusher": 2, "large-cliff-crusher": 3,
+  "vent-condenser": 3, "reinforced-pump": 2, "cliff-crusher": 2, "large-cliff-crusher": 3,
   "plasma-bore": 2, "large-plasma-bore": 3, "impact-drill": 4, "eruption-drill": 5,
   "turbine-condenser": 3, "chemical-combustion-chamber": 3, "pyrolysis-generator": 3,
   "flux-reactor": 5, "neoplasia-reactor": 5,
@@ -275,6 +280,7 @@ function resourceChip(resource, boosted = false, direction = "input") {
   }
   if (resource.kind === "power") return `<span class="${className}" title="Power">${arrange(`<img class="resource__power" src="${A}/resources/power.png" alt="Power">`)}</span>`;
   if (resource.kind === "heat") return `<span class="${className}" title="Heat">${arrange('<i class="resource__heat" aria-label="Heat">&#xE83B;</i>')}</span>`;
+  if (resource.kind === "liquid") return `<span class="${className}" title="Pumped floor liquid">${arrange(`<img class="resource__liquid" src="${A}/resources/liquid.png" alt="Any pumped liquid">`)}</span>`;
   return `<span class="${className}">${value}</span>`;
 }
 
@@ -316,7 +322,7 @@ function blockCard(block) {
 }
 
 const officialGroups = [
-  { name: "Production", ids: ["vent-condenser", "cliff-crusher", "large-cliff-crusher", "plasma-bore", "large-plasma-bore", "impact-drill", "eruption-drill"] },
+  { name: "Production", ids: [["vent-condenser", "reinforced-pump"], "cliff-crusher", "large-cliff-crusher", "plasma-bore", "large-plasma-bore", "impact-drill", "eruption-drill"] },
   { name: "Power", ids: ["turbine-condenser", "chemical-combustion-chamber", "pyrolysis-generator", "flux-reactor", "neoplasia-reactor"] },
   { name: "Crafting", ids: ["silicon-arc-furnace", "electrolyzer", "atmospheric-concentrator", "oxidation-chamber", "electric-heater", "slag-heater", "phase-heater", "carbide-crucible", "surge-crucible", "cyanogen-synthesizer", "phase-synthesizer"] }
 ];
@@ -328,7 +334,9 @@ grid.innerHTML = `
     ${officialGroups.map(group => `
       <section class="category-group category-group--${group.name.toLowerCase()}">
         <h2 class="group-title">${group.name}</h2>
-        <div class="category-grid">${group.ids.map(id => blockCard(byId.get(id))).join("")}</div>
+        <div class="category-grid">${group.ids.map(entry => Array.isArray(entry)
+          ? `<div class="entry-stack">${entry.map(id => blockCard(byId.get(id))).join("")}</div>`
+          : blockCard(byId.get(entry))).join("")}</div>
       </section>
     `).join("")}
   </div>
