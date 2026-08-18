@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101416">
-  <meta name="description" content="A compact Mindustry Erekir production and logistics reference.">
+  <meta name="description" content="A compact Mindustry Erekir and Serpulo reference.">
   <link rel="icon" href="data:,">
   <title>Mindustry Cheatsheet</title>
   <link rel="stylesheet" href="styles.css">
@@ -19,9 +19,16 @@
         <button class="filter" data-filter="units">Units</button>
       </nav>
       <div class="toolbar-actions">
+        <label class="planet-filter" for="planet-filter">
+          <span>Planet</span>
+          <select id="planet-filter" aria-label="Planet">
+            <option value="erekir" selected>Erekir</option>
+            <option value="serpulo">Serpulo</option>
+          </select>
+        </label>
         <label class="progression-filter" for="sector-filter">
           <span>Latest sector</span>
-          <select id="sector-filter" aria-label="Latest Erekir sector captured"></select>
+          <select id="sector-filter" aria-label="Latest sector captured"></select>
         </label>
         <button class="download-button" id="download-button" type="button" title="Save the current cheatsheet view as a PNG">Download</button>
       </div>
@@ -30,6 +37,7 @@
     <section class="block-grid" id="block-grid" aria-live="polite"></section>
   </main>
 
+  <script src="serpulo-data.js"></script>
   <script src="assets/vendor/asset-data.js"></script>
   <script src="assets/vendor/html-to-image.min.js"></script>
   <script src="app.js"></script>

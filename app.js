@@ -466,6 +466,10 @@ blocks.forEach(block => {
 
 const grid = document.querySelector("#block-grid");
 
+let activeData;
+let activeSectorRank;
+const assetPath = (kind, id) => `${activeData.assetRoot}/${kind}/${id}.png`;
+
 function resourceChip(resource, boosted = false, direction = "input") {
   const value = String(resource.value).replaceAll("/s", "");
   const className = `resource${boosted ? " resource--boost" : ""}`;
@@ -482,7 +486,7 @@ function resourceChip(resource, boosted = false, direction = "input") {
     return `<span class="${className}" title="${prefix}${resource.icon}">${arrange(`<img src="${icons[resource.icon]}" alt="">`)}</span>`;
   }
   if (resource.unit) {
-    return `<span class="${className}" title="${prefix}${resource.unit}">${arrange(`<img src="${A}/units/${resource.unit}.png" alt="">`)}</span>`;
+    return `<span class="${className}" title="${prefix}${resource.unit}">${arrange(`<img src="${assetPath("units", resource.unit)}" alt="">`)}</span>`;
   }
   if (resource.kind === "power") return `<span class="${className}" title="Power">${arrange(`<img class="resource__power" src="${A}/resources/power.png" alt="Power">`)}</span>`;
   if (resource.kind === "heat") return `<span class="${className}" title="Heat">${arrange('<i class="resource__heat" aria-label="Heat">&#xE83B;</i>')}</span>`;
@@ -497,7 +501,7 @@ function recipe(block) {
   const boostOutput = block.booster?.output.map(resource => resourceChip(resource, true, "output")).join("") ?? "";
   return `<div class="recipe ${input ? "" : "recipe--source"}" aria-label="${block.name} recipe">
     ${input ? `<div class="recipe__side recipe__side--input">${input}${boostInput}</div><span class="recipe__arrow" aria-hidden="true">→</span>` : ""}
-    <div class="sprite-wrap"><img class="sprite" src="${A}/blocks/${block.id}.png" alt="${block.name} game sprite"></div>
+    <div class="sprite-wrap"><img class="sprite" src="${assetPath("blocks", block.id)}" alt="${block.name} game sprite"></div>
     <span class="recipe__arrow" aria-hidden="true">→</span>
     <div class="recipe__side recipe__side--output">${output}${boostOutput}</div>
   </div>`;
@@ -516,8 +520,10 @@ function wallRateGuide(block) {
 }
 
 function blockCard(block) {
+  const unlockSector = block.unlockSector ?? block.sector;
+  const sectorName = activeData.sectors[activeSectorRank.get(unlockSector)]?.[1] ?? unlockSector;
   return `
-  <article class="card" tabindex="0" data-category="${block.category}" data-size="${block.size}" data-unlock-sector="${block.unlockSector}" style="--card-accent:${block.accent};--block-size:${block.size}" aria-label="${block.name}. ${block.size} by ${block.size} tiles. Available by ${campaignSectors[sectorRank.get(block.unlockSector)][1]}. Focus or hover for description." aria-describedby="description-${block.id}">
+  <article class="card" tabindex="0" data-category="${block.category}" data-size="${block.size}" data-unlock-sector="${unlockSector}" style="--card-accent:${block.accent};--block-size:${block.size}" aria-label="${block.name}. ${block.size} by ${block.size} tiles. Available by ${sectorName}. Focus or hover for description." aria-describedby="description-${block.id}">
     <div class="card__body">
       <h2>${block.name}</h2>
       ${recipe(block)}
@@ -568,12 +574,13 @@ function turretCard(turret) {
     ${turretIcon(booster)}<span>${booster.amount}</span><b>(${booster.speed})</b>
   </div>`).join("");
 
-  return `<article class="turret-entry" data-unlock-sector="${turret.sector}" style="--turret-accent:${turret.accent};--turret-size:${turret.size}" aria-label="${turret.name}. Available by ${campaignSectors[sectorRank.get(turret.sector)][1]}.">
+  const sectorName = activeData.sectors[activeSectorRank.get(turret.sector)]?.[1] ?? turret.sector;
+  return `<article class="turret-entry" data-unlock-sector="${turret.sector}" style="--turret-accent:${turret.accent};--turret-size:${turret.size}" aria-label="${turret.name}. Available by ${sectorName}.">
     <h2>${turret.name} <span class="turret-targets">(${turret.targets})</span><span class="turret-range" title="Range in tiles">Range ${turret.range / 8}</span><span class="turret-description">${turret.description}</span></h2>
     <div class="turret-entry__main">
       <div class="turret-visual" title="${turret.size} by ${turret.size} tiles">
-        <img class="turret-base" src="${A}/turrets/bases/${turret.size}.png" alt="">
-        <img class="turret-face" src="${A}/turrets/${turret.id}.png" alt="${turret.name} turret facing right">
+        <img class="turret-base" src="${activeData.assetRoot}/turrets/bases/${turret.size}.png" alt="">
+        <img class="turret-face" src="${assetPath("turrets", turret.id)}" alt="${turret.name} turret facing right">
         <span class="turret-shot" aria-hidden="true"></span>
       </div>
       <div class="turret-cost" aria-label="Construction cost"><span class="turret-column-label">Cost</span>${cost}</div>
@@ -590,11 +597,11 @@ function turretCard(turret) {
 }
 
 function unitNode(unit, tier) {
-  const stats = unitStats[unit.id];
+  const stats = unit.stats ?? activeData.unitStats?.[unit.id];
   const damage = unitDps(stats);
   return `<article class="unit-node" data-unlock-sector="${unit.sector}" style="--unit-size:${48 + tier * 14}px" tabindex="0" aria-label="${unit.name}, tier ${tier}. ${unit.description}">
     <h3>${unit.name}<br><span class="unit-node__tier">Tier ${tier}</span></h3>
-    <div class="unit-node__visual"><img src="${A}/units/${unit.id}.png" alt="${unit.name}"></div>
+    <div class="unit-node__visual"><img src="${assetPath("units", unit.id)}" alt="${unit.name}"></div>
     <dl class="unit-node__stats" aria-label="${unit.name} combat statistics">
       <div><dt>Health</dt><dd>${stats.health}</dd></div>
       <div><dt>Range</dt><dd title="Range in tiles">${stats.range}</dd></div>
@@ -607,7 +614,7 @@ function unitNode(unit, tier) {
 
 function unitRecipeResource(resource) {
   let visual = "";
-  if (resource.unit) visual = `<img src="${A}/units/${resource.unit}.png" alt="${resource.unit}">`;
+  if (resource.unit) visual = `<img src="${assetPath("units", resource.unit)}" alt="${resource.unit}">`;
   else if (resource.wall) visual = `<img src="${A}/walls/${resource.wall}-wall-large.png" alt="Large ${resource.wall} wall">`;
   else if (resource.icon) visual = `<img src="${icons[resource.icon]}" alt="${resource.icon}">`;
   else if (resource.kind === "power") visual = `<img class="unit-edge-recipe__power" src="${A}/resources/power.png" alt="Power">`;
@@ -618,7 +625,7 @@ function unitEdgeRecipe(recipe) {
   const payloads = recipe.resources.filter(resource => resource.unit);
   const resources = recipe.resources.filter(resource => !resource.unit);
   return `<aside class="unit-edge-recipe${recipe.blocks.length > 1 ? " unit-edge-recipe--multi" : ""}" aria-label="${recipe.blocks.map(block => block.name).join(" and ")}">
-    <span class="unit-edge-recipe__blocks">${recipe.blocks.map(block => `<img src="${A}/blocks/${block.id}.png" alt="${block.name}" title="${block.name}">`).join("")}</span>
+    <span class="unit-edge-recipe__blocks">${recipe.blocks.map(block => `<img src="${assetPath("blocks", block.id)}" alt="${block.name}" title="${block.name}">`).join("")}</span>
     ${payloads.length ? `<span class="unit-edge-recipe__payloads">${payloads.map(unitRecipeResource).join("")}</span>` : ""}
     <span class="unit-edge-recipe__resources">${resources.map(unitRecipeResource).join("")}</span>
   </aside>`;
@@ -651,17 +658,47 @@ function unitTree(group) {
   </section>`;
 }
 
+function serpuloUnitBranch(branch) {
+  return `<section class="serpulo-unit-branch" aria-label="${branch.name} unit branch">
+    <h3>${branch.name}</h3>
+    <div class="serpulo-unit-branch__track">
+      ${branch.units.map((unit, index) => `${index ? `<span class="serpulo-unit-edge" data-unlock-sector="${unit.sector}" aria-hidden="true"></span>` : ""}${unitResult(unit, index + 1, branch.recipes[index])}`).join("")}
+    </div>
+  </section>`;
+}
+
+function serpuloUnitCategory(category) {
+  return `<section class="serpulo-unit-category" style="--unit-accent:${category.accent}">
+    <h2>${category.name}</h2>
+    <div class="serpulo-unit-category__branches">${category.branches.map(serpuloUnitBranch).join("")}</div>
+  </section>`;
+}
+
 const officialGroups = [
   { name: "Production", ids: [["vent-condenser", "reinforced-pump"], "cliff-crusher", "large-cliff-crusher", "plasma-bore", "large-plasma-bore", "impact-drill", "eruption-drill"] },
   { name: "Power", ids: ["turbine-condenser", "chemical-combustion-chamber", "pyrolysis-generator", "flux-reactor", "neoplasia-reactor"] },
   { name: "Crafting", ids: ["silicon-arc-furnace", "electrolyzer", "atmospheric-concentrator", "oxidation-chamber", "electric-heater", "slag-heater", "phase-heater", "carbide-crucible", "surge-crucible", "cyanogen-synthesizer", "phase-synthesizer"] }
 ];
 
-const byId = new Map(blocks.map(block => [block.id, block]));
+const filters = [...document.querySelectorAll(".filter")];
+const sectorFilter = document.querySelector("#sector-filter");
+const planetFilter = document.querySelector("#planet-filter");
+const downloadButton = document.querySelector("#download-button");
+const wordmark = document.querySelector(".wordmark");
+const erekirData = {
+  id: "erekir", name: "Erekir", assetRoot: A, sectors: campaignSectors,
+  blocks, groups: officialGroups, turrets, unitProgressions, unitStats
+};
+const planetData = { erekir: erekirData, serpulo: window.serpuloData };
+Object.assign(icons, window.serpuloData?.icons ?? {});
 
-grid.innerHTML = `
-  <div class="infrastructure-layout">
-    ${officialGroups.map(group => `
+let cards = [];
+let progressionEntries = [];
+
+function renderInfrastructure() {
+  const byId = new Map(activeData.blocks.map(block => [block.id, block]));
+  return `<div class="infrastructure-layout">
+    ${activeData.groups.map(group => `
       <section class="category-group category-group--${group.name.toLowerCase()}">
         <h2 class="group-title">${group.name}</h2>
         <div class="category-grid">${group.ids.map(entry => Array.isArray(entry)
@@ -669,29 +706,55 @@ grid.innerHTML = `
           : blockCard(byId.get(entry))).join("")}</div>
       </section>
     `).join("")}
-  </div>
-  <div class="units-layout" hidden>
-    ${unitProgressions.map(unitTree).join("")}
-  </div>
-  <div class="turrets-layout" hidden>
-    ${turrets.map(turretCard).join("")}
   </div>`;
+}
 
-const cards = [...document.querySelectorAll(".card")];
-const progressionEntries = [...document.querySelectorAll("[data-unlock-sector]")];
-const filters = [...document.querySelectorAll(".filter")];
-const sectorFilter = document.querySelector("#sector-filter");
-const downloadButton = document.querySelector("#download-button");
+function renderUnits() {
+  if (activeData.unitCategories) {
+    return `<div class="units-layout units-layout--serpulo" hidden>${activeData.unitCategories.map(serpuloUnitCategory).join("")}</div>`;
+  }
+  return `<div class="units-layout" hidden>${activeData.unitProgressions.map(unitTree).join("")}</div>`;
+}
 
-sectorFilter.innerHTML = campaignSectors.map(([id, name]) => `<option value="${id}">${name}</option>`).join("");
+function renderPlanet(planetId, selectedSector, selectedView) {
+  activeData = planetData[planetId] ?? erekirData;
+  activeSectorRank = new Map(activeData.sectors.map(([id], index) => [id, index]));
+  document.body.dataset.planet = activeData.id;
+  document.title = `Mindustry Cheatsheet - ${activeData.name}`;
+  wordmark.innerHTML = `<span></span> Mindustry Cheatsheet - ${activeData.name}`;
+  planetFilter.value = activeData.id;
+  sectorFilter.innerHTML = activeData.sectors.map(([id, name]) => `<option value="${id}">${name}</option>`).join("");
+  sectorFilter.setAttribute("aria-label", `Latest ${activeData.name} sector captured`);
+
+  grid.innerHTML = `${renderInfrastructure()}
+    ${renderUnits()}
+    <div class="turrets-layout" hidden>${activeData.turrets.map(turretCard).join("")}</div>`;
+
+  cards = [...document.querySelectorAll(".card")];
+  progressionEntries = [...document.querySelectorAll("[data-unlock-sector]")];
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const willOpen = !card.classList.contains("is-open");
+      cards.forEach(other => other.classList.remove("is-open"));
+      card.classList.toggle("is-open", willOpen);
+    });
+  });
+
+  const url = new URL(location.href);
+  url.searchParams.set("planet", activeData.id);
+  history.replaceState(null, "", url);
+  showView(selectedView ?? grid.dataset.view);
+  filterBySector(selectedSector);
+}
 
 function filterBySector(selected) {
-  const fallback = campaignSectors.at(-1)[0];
-  const sector = sectorRank.has(selected) ? selected : fallback;
-  const capturedRank = sectorRank.get(sector);
+  const fallback = activeData.sectors.at(-1)[0];
+  const sector = activeSectorRank.has(selected) ? selected : fallback;
+  const capturedRank = activeSectorRank.get(sector);
   sectorFilter.value = sector;
   progressionEntries.forEach(entry => {
-    entry.toggleAttribute("hidden", sectorRank.get(entry.dataset.unlockSector) > capturedRank);
+    const entryRank = activeSectorRank.get(entry.dataset.unlockSector) ?? 0;
+    entry.toggleAttribute("hidden", entryRank > capturedRank);
   });
   document.querySelectorAll(".entry-stack").forEach(stack => {
     stack.hidden = [...stack.querySelectorAll(".card")].every(card => card.hidden);
@@ -702,7 +765,7 @@ function filterBySector(selected) {
 }
 
 function showView(selected) {
-  const view = selected === "units" ? "units" : selected === "turrets" ? "turrets" : "production";
+  const view = selected === "units" ? "units" : selected === "turrets" || selected === "defence" ? "turrets" : "production";
   const tab = view === "production" ? "infrastructure" : view;
   filters.forEach(button => button.classList.toggle("is-active", button.dataset.filter === tab));
   grid.dataset.view = view;
@@ -718,17 +781,9 @@ function showView(selected) {
 filters.forEach(button => button.addEventListener("click", () => showView(button.dataset.filter)));
 
 const initialParams = new URLSearchParams(location.search);
-showView(initialParams.get("tab"));
-filterBySector(initialParams.get("sector"));
+renderPlanet(initialParams.get("planet"), initialParams.get("sector"), initialParams.get("tab"));
 sectorFilter.addEventListener("change", () => filterBySector(sectorFilter.value));
-
-cards.forEach(card => {
-  card.addEventListener("click", () => {
-    const willOpen = !card.classList.contains("is-open");
-    cards.forEach(other => other.classList.remove("is-open"));
-    card.classList.toggle("is-open", willOpen);
-  });
-});
+planetFilter.addEventListener("change", () => renderPlanet(planetFilter.value, null, grid.dataset.view));
 
 async function renderPagePng() {
   const shell = document.querySelector(".app-shell");
@@ -783,7 +838,7 @@ async function downloadCurrentPage() {
     const dataUrl = await renderPagePng();
     const view = grid.dataset.view === "production" ? "infrastructure" : grid.dataset.view === "turrets" ? "defence" : "units";
     const link = document.createElement("a");
-    link.download = `mindustry-cheatsheet-erekir-${view}-${sectorFilter.value}.png`;
+    link.download = `mindustry-cheatsheet-${activeData.id}-${view}-${sectorFilter.value}.png`;
     link.href = dataUrl;
     link.click();
   } catch (error) {

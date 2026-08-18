@@ -15,7 +15,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; }
+html, body { margin: 0; min-height: 100%; overflow-x: hidden; }
 
 body {
   color: var(--ink);
@@ -63,7 +63,8 @@ body {
   gap: 7px;
 }
 
-.progression-filter {
+.progression-filter,
+.planet-filter {
   display: flex;
   align-items: center;
   justify-self: end;
@@ -94,7 +95,8 @@ body {
 .download-button:disabled { opacity: .58; cursor: wait; }
 .is-capturing .download-button { display: none; }
 
-.progression-filter select {
+.progression-filter select,
+.planet-filter select {
   height: 30px;
   padding: 0 25px 0 9px;
   border: 1px solid var(--line);
@@ -106,6 +108,8 @@ body {
   font-weight: 700;
   cursor: pointer;
 }
+
+.planet-filter span { color: var(--accent); }
 
 .filters {
   display: flex;
@@ -585,6 +589,128 @@ body {
 .unit-tree__branch:has(.unit-node:hover),
 .unit-tree__branch:has(.unit-node:focus-visible) { z-index: 6; }
 
+.units-layout--serpulo {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.serpulo-unit-category {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: 34px minmax(0, 1fr);
+}
+
+.serpulo-unit-category > h2 {
+  margin: 0;
+  align-self: end;
+  color: var(--unit-accent);
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.serpulo-unit-category__branches {
+  display: grid;
+  min-height: 0;
+  grid-auto-rows: 220px;
+  align-content: space-evenly;
+}
+
+.serpulo-unit-branch {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: 14px 206px;
+}
+
+.serpulo-unit-branch > h3 {
+  z-index: 2;
+  margin: 0;
+  color: color-mix(in srgb, var(--unit-accent) 75%, #fff);
+  font-size: .56rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.serpulo-unit-branch__track {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.serpulo-unit-edge {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 12px;
+  height: 2px;
+  flex: 0 1 12px;
+  color: color-mix(in srgb, var(--unit-accent) 72%, #fff);
+  background: currentColor;
+}
+
+.serpulo-unit-edge::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  border-block: 5px solid transparent;
+  border-left: 8px solid currentColor;
+}
+
+.units-layout--serpulo .unit-result,
+.units-layout--serpulo .unit-result--multi {
+  width: 112px;
+  height: 206px;
+  flex: 0 1 112px;
+  grid-template-columns: 44px minmax(58px, 68px);
+}
+
+.units-layout--serpulo .unit-edge-recipe,
+.units-layout--serpulo .unit-edge-recipe--multi {
+  width: 44px;
+  max-height: 160px;
+  padding: 1px 0;
+  font-size: .52rem;
+}
+
+.units-layout--serpulo .unit-edge-recipe__blocks img { width: 31px; height: 31px; }
+.units-layout--serpulo .unit-edge-recipe__payloads { font-size: 1rem; }
+.units-layout--serpulo .unit-edge-recipe__payloads img { width: 24px; height: 24px; }
+.units-layout--serpulo .unit-edge-recipe__resources img { width: 12px; height: 12px; }
+
+.units-layout--serpulo .unit-node {
+  --stat-shift: 0px;
+  width: 68px;
+  height: 206px;
+  grid-template-rows: 25px 104px 74px;
+}
+
+.units-layout--serpulo .unit-node__visual { width: 68px; height: 104px; }
+.units-layout--serpulo .unit-node__visual img {
+  width: min(var(--unit-size), 68px);
+  height: min(var(--unit-size), 68px);
+}
+
+.units-layout--serpulo .unit-node__stats {
+  width: 76px;
+  padding: 2px;
+  font-size: .53rem;
+}
+
+.units-layout--serpulo .unit-node__stats dd { font-size: .62rem; }
+.units-layout--serpulo .unit-node__damage-extra { gap-inline: 3px; font-size: .4rem !important; }
+.units-layout--serpulo .unit-node__description { width: 118px; font-size: .55rem; }
+.units-layout--serpulo .unit-node h3 { font-size: .66rem; }
+.units-layout--serpulo .unit-node__tier { font-size: .43rem; }
+.units-layout--serpulo .serpulo-unit-branch .unit-result:last-child .unit-node__description {
+  transform: translateX(calc(-50% - 22px));
+}
+
 @media (min-width: 1091px) and (max-width: 1300px) {
   .units-layout { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
   .unit-tree__track { --core-half: 55px; --stat-width: 110px; --tier-4-width: 140px; --tier-5-width: 166px; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, 240px); }
@@ -616,6 +742,7 @@ body {
 
 @media (max-width: 1090px) {
   .units-layout { grid-template-columns: 1fr; grid-template-rows: repeat(3, auto); }
+  .units-layout--serpulo { grid-template-columns: 1fr; }
   .unit-tree { grid-template-rows: 32px auto; }
   .unit-tree__track { width: 470px; }
 }
@@ -1180,8 +1307,77 @@ body {
   .app-shell { width: calc(100% - 6px); min-height: 540px; margin-left: 6px; padding-block: 5px; }
   .toolbar { grid-template-columns: 1fr auto auto; }
   .filters { justify-self: center; }
-  .progression-filter span { display: none; }
+  .progression-filter span,
+  .planet-filter span { display: none; }
   .wordmark { font-size: .58rem; }
+}
+
+body[data-planet="serpulo"] .infrastructure-layout { gap: 5px; }
+body[data-planet="serpulo"] .category-group { grid-template-rows: 15px auto; }
+body[data-planet="serpulo"] .group-title { line-height: 15px; }
+body[data-planet="serpulo"] .category-grid { row-gap: 2px; }
+body[data-planet="serpulo"] .card { --tile-unit: 17px; }
+body[data-planet="serpulo"] .category-group--production .card { --tile-unit: 17px; }
+body[data-planet="serpulo"] .card__body { padding: 3px 5px; }
+body[data-planet="serpulo"] .card h2 { margin-bottom: 3px; font-size: clamp(.61rem, .62vw, .76rem); }
+body[data-planet="serpulo"] .recipe__side { gap: 1px; }
+body[data-planet="serpulo"] .resource { --resource-icon-size: clamp(12px, .75vw, 15px); gap: 1px; }
+body[data-planet="serpulo"] .resource--boost { margin-top: 1px; padding: 1px 2px; }
+body[data-planet="serpulo"] .turrets-layout { gap: 1px 7px; }
+body[data-planet="serpulo"] .turret-entry {
+  --turret-tile: 16px;
+  min-height: 0;
+  grid-template-rows: auto minmax(78px, auto);
+  row-gap: 1px;
+  padding: 2px 7px;
+}
+body[data-planet="serpulo"] .turret-entry h2 { font-size: .76rem; line-height: 14px; }
+body[data-planet="serpulo"] .turret-entry h2 .turret-targets { font-size: .62rem; }
+body[data-planet="serpulo"] .turret-description { margin-left: 5px; font-size: .55rem; }
+body[data-planet="serpulo"] .turret-range { margin-left: 5px; font-size: .58rem; }
+body[data-planet="serpulo"] .turret-entry__main { column-gap: 4px; }
+body[data-planet="serpulo"] .turret-visual { width: 78px; height: 82px; }
+body[data-planet="serpulo"] .turret-column-label { height: 20px; font-size: .62rem; }
+body[data-planet="serpulo"] .turret-cost { gap: 1px; margin-right: 5px; }
+body[data-planet="serpulo"] .turret-cost__item,
+body[data-planet="serpulo"] .turret-booster { height: 13px; font-size: .56rem; }
+body[data-planet="serpulo"] .turret-cost__item img,
+body[data-planet="serpulo"] .turret-booster img { width: 12px; height: 12px; }
+body[data-planet="serpulo"] .turret-ammo { column-gap: 4px; margin-right: 5px; font-size: .56rem; }
+body[data-planet="serpulo"] .turret-ammo__head,
+body[data-planet="serpulo"] .turret-ammo__round { min-height: 14px; }
+body[data-planet="serpulo"] .turret-ammo__head { height: 20px; font-size: .62rem; }
+body[data-planet="serpulo"] .turret-ammo__type { gap: 3px; }
+body[data-planet="serpulo"] .turret-ammo__type img,
+body[data-planet="serpulo"] .turret-ammo__type i { width: 12px; height: 12px; font-size: 12px; }
+body[data-planet="serpulo"] .turret-boosters { gap: 1px; }
+body[data-planet="serpulo"] .turret-column-label,
+body[data-planet="serpulo"] .turret-cost__item,
+body[data-planet="serpulo"] .turret-booster,
+body[data-planet="serpulo"] .turret-booster--none,
+body[data-planet="serpulo"] .turret-ammo__head > span,
+body[data-planet="serpulo"] .turret-ammo__round > span { padding-inline: 2px; }
+
+@media (min-width: 1091px) and (max-width: 1599px) {
+  body[data-planet="serpulo"] .serpulo-unit-branch__track {
+    width: 125%;
+    transform: scale(.8);
+    transform-origin: left center;
+  }
+}
+
+@media (min-width: 1091px) and (max-width: 1400px) {
+  body[data-planet="serpulo"] .serpulo-unit-branch__track {
+    width: 138.889%;
+    transform: scale(.72);
+  }
+}
+
+@media (min-width: 1091px) and (max-height: 800px) {
+  body[data-planet="serpulo"] .turrets-layout {
+    width: 144.928%;
+    zoom: .69;
+  }
 }
 
 @media (max-width: 620px) {
